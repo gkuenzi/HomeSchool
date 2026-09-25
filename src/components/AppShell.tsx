@@ -1,32 +1,20 @@
 import type { ReactNode } from 'react';
-import { CATEGORIES } from '../domain/categories';
 
 interface AppShellProps {
   children: ReactNode;
+  onOpenLearningChart: () => void;
 }
 
-export function AppShell({ children }: AppShellProps) {
+export function AppShell({ children, onOpenLearningChart }: AppShellProps) {
   return (
     <div className="app-shell">
       <header className="app-header">
         <a className="app-brand" href="/">HomeSchool</a>
-        <span className="app-header-label">Progress workspace</span>
+        <button className="chart-navigation" onClick={onOpenLearningChart} type="button">
+          Learning Chart <span aria-hidden="true">↗</span>
+        </button>
       </header>
-      <div className="app-body">
-        <aside className="category-navigation" aria-label="Categories">
-          <p className="navigation-label">Categories</p>
-          <nav>
-            <ul>
-              {CATEGORIES.map((category) => (
-                <li key={category.id}>
-                  <button type="button" disabled>{category.name}</button>
-                </li>
-              ))}
-            </ul>
-          </nav>
-        </aside>
-        <main className="app-content">{children}</main>
-      </div>
+      <main className="app-content">{children}</main>
     </div>
   );
 }

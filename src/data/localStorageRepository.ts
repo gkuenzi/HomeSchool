@@ -1,5 +1,7 @@
 import { createDefaultState, STORAGE_VERSION } from './defaultState';
 import type { HomeSchoolState } from '../domain/models';
+import { CATEGORIES } from '../domain/categories';
+import { getWeekStartDate } from '../domain/dates';
 
 export const HOME_SCHOOL_STORAGE_KEY = 'homeschool.state';
 
@@ -31,7 +33,25 @@ export const createLocalStorageRepository = (
       if (!storedValue) return createDefaultState();
 
       const parsedValue: unknown = JSON.parse(storedValue);
-      return isHomeSchoolState(parsedValue) ? parsedValue : createDefaultState();
+      if (!isHomeSchoolState(parsedValue)) return createDefaultState();
+
+      const weeklyChecklist = parsedValue.weeklyChecklist;
+      const completedCategoryIds =
+        weeklyChecklist &&
+        weeklyChecklist.weekStart === getWeekStartDate() &&
+        Array.isArray(weeklyChecklist.completedCategoryIds)
+          ? weeklyChecklist.completedCategoryIds.filter((categoryId) =>
+              CATEGORIES.some((category) => category.id === categoryId),
+            )
+          : [];
+
+      return {
+        ...parsedValue,
+        weeklyChecklist: {
+          weekStart: getWeekStartDate(),
+          completedCategoryIds,
+        },
+      };
     } catch {
       return createDefaultState();
     }
